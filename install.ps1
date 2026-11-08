@@ -22,5 +22,7 @@ $sc.TargetPath = $exe
 $sc.Arguments = '--watchdog'
 $sc.Save()
 
-Start-Process $exe -ArgumentList '--watchdog'
+# Se lanza a través del Explorador (igual que al iniciar sesión) para que no quede atado
+# a la consola/job que ejecuta este script: si esa consola se cierra, la app sigue viva.
+Start-Process explorer.exe -ArgumentList "`"$lnk`""
 Write-Host "Instalado en $exe y en ejecución. Presioná la tecla Copilot (o Alt+Espacio)."
