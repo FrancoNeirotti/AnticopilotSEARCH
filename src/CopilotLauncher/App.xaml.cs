@@ -29,6 +29,17 @@ public partial class App : System.Windows.Application
             return;
         }
 
+        if (e.Args.Any(a => a.Equals("--watchdog", StringComparison.OrdinalIgnoreCase)))
+        {
+            Watchdog.Run(e.Args.Where(a => !a.Equals("--watchdog", StringComparison.OrdinalIgnoreCase)).ToArray());
+            Shutdown();
+            return;
+        }
+
+        InstallCrashHandlers();
+        // Render por software: evita que un reinicio del driver de video tire abajo la app.
+        System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
+
         _mutex = new Mutex(true, MutexName, out bool isNew);
         if (!isNew)
         {
@@ -135,8 +146,30 @@ public partial class App : System.Windows.Application
         };
     }
 
+    private void InstallCrashHandlers()
+    {
+        DispatcherUnhandledException += (_, args) =>
+        {
+            Log.Info("Excepción no controlada en la interfaz (se continúa):");
+            Log.Error(args.Exception);
+            args.Handled = true;
+        };
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            Log.Info($"Excepción fatal (terminando={args.IsTerminating}):");
+            if (args.ExceptionObject is Exception ex) Log.Error(ex);
+        };
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Log.Error(args.Exception);
+            args.SetObserved();
+        };
+        SessionEnding += (_, args) => Log.Info($"Cierre de sesión de Windows: {args.ReasonSessionEnding}");
+    }
+
     private void ExitApp()
     {
+        Log.Info("Salida solicitada desde el menú");
         _hook?.Dispose();
         _fallbackHotKey?.Dispose();
         if (_tray != null) { _tray.Visible = false; _tray.Dispose(); }
@@ -145,6 +178,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        if (_window != null) Log.Info($"Proceso finalizando (código {e.ApplicationExitCode})");
         _hook?.Dispose();
         _fallbackHotKey?.Dispose();
         if (_tray != null) _tray.Visible = false;

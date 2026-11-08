@@ -12,14 +12,15 @@ Copy-Item $src $dest -Force
 $exe = Join-Path $dest 'CopilotLauncher.exe'
 
 # Inicio automático con Windows
-Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'CopilotLauncher' -Value "`"$exe`" --silent"
+Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'CopilotLauncher' -Value "`"$exe`" --watchdog --silent"
 
 # Acceso directo en el menú Inicio
 $lnk = Join-Path ([Environment]::GetFolderPath('Programs')) 'Copilot Launcher.lnk'
 $shell = New-Object -ComObject WScript.Shell
 $sc = $shell.CreateShortcut($lnk)
 $sc.TargetPath = $exe
+$sc.Arguments = '--watchdog'
 $sc.Save()
 
-Start-Process $exe
+Start-Process $exe -ArgumentList '--watchdog'
 Write-Host "Instalado en $exe y en ejecución. Presioná la tecla Copilot (o Alt+Espacio)."

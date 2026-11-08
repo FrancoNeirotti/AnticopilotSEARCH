@@ -21,7 +21,7 @@ public static class StartupManager
         {
             using var key = Registry.CurrentUser.CreateSubKey(RunKey);
             if (enabled)
-                key.SetValue(ValueName, $"\"{Environment.ProcessPath}\" --silent");
+                key.SetValue(ValueName, $"\"{Environment.ProcessPath}\" --watchdog --silent");
             else
                 key.DeleteValue(ValueName, false);
         }

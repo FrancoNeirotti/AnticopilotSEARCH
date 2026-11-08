@@ -60,6 +60,10 @@ Haciendo clic derecho en el ícono de la lupa:
 
 ## Diagnóstico
 
+- La app arranca con un proceso **vigilante** (`--watchdog`) que la vuelve a abrir si se cierra de forma inesperada. Si salís desde el menú de la bandeja, no se reabre.
+- Los errores y los motivos de cierre quedan en `%LOCALAPPDATA%\CopilotLauncher\launcher.log`.
+- La ventana se dibuja por software, para que un reinicio del driver de video no la cierre.
+
 ```powershell
 .\publish\CopilotLauncher.exe --selftest excel
 ```
