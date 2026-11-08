@@ -35,6 +35,8 @@ public sealed class SearchResult : INotifyPropertyChanged
         _ => "Archivo"
     };
 
+    public string GroupLabel => Kind == ResultKind.App ? "Aplicaciones" : "Archivos";
+
     public ImageSource? Icon
     {
         get

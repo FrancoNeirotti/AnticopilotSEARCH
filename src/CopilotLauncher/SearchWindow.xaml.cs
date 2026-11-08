@@ -5,7 +5,10 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using Color = System.Windows.Media.Color;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using Forms = System.Windows.Forms;
@@ -77,6 +80,19 @@ public partial class SearchWindow : Window
             await SearchFilesAsync();
         };
         Deactivated += (_, _) => HideLauncher();
+        ApplyAccent();
+        Microsoft.Win32.SystemEvents.UserPreferenceChanged += (_, _) => Dispatcher.BeginInvoke(ApplyAccent);
+    }
+
+    private void ApplyAccent()
+    {
+        var c = AccentColors.Get();
+        var accent = new SolidColorBrush(c);
+        accent.Freeze();
+        var bg = new SolidColorBrush(Color.FromArgb(0x38, c.R, c.G, c.B));
+        bg.Freeze();
+        Resources["Accent"] = accent;
+        Resources["AccentBg"] = bg;
     }
 
     public void Prepare()
@@ -174,13 +190,20 @@ public partial class SearchWindow : Window
     private void ShowResults(List<SearchResult> results, bool keepSelection = false)
     {
         int prev = ResultsList.SelectedIndex;
-        ResultsList.ItemsSource = results;
+        var view = new ListCollectionView(results);
+        view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(SearchResult.GroupLabel)));
+        ResultsList.ItemsSource = view;
         ResultsPanel.Visibility = QueryBox.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         if (results.Count > 0)
             ResultsList.SelectedIndex = keepSelection && prev >= 0 && prev < results.Count ? prev : 0;
-        StatusText.Text = results.Count == 0 && QueryBox.Text.Length > 0
-            ? "Sin resultados"
-            : "Enter: abrir · Ctrl+Enter: abrir ubicación · Ctrl+Shift+Enter: como administrador · Esc: cerrar";
+        SetStatus(results.Count == 0 && QueryBox.Text.Length > 0 ? "Sin resultados" : null);
+    }
+
+    private void SetStatus(string? text)
+    {
+        StatusText.Text = text ?? string.Empty;
+        StatusText.Visibility = string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
+        StatusText.Margin = new Thickness(16, ResultsList.Items.Count == 0 ? 10 : 0, 16, 8);
     }
 
     private void QueryBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -235,7 +258,7 @@ public partial class SearchWindow : Window
         catch (Exception ex)
         {
             Log.Error(ex);
-            StatusText.Text = "No se pudo abrir: " + ex.Message;
+            SetStatus("No se pudo abrir: " + ex.Message);
         }
     }
 }

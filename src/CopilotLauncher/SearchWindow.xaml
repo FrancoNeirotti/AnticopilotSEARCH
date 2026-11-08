@@ -1,8 +1,8 @@
-<Window x:Class="CopilotLauncher.SearchWindow"
+﻿<Window x:Class="CopilotLauncher.SearchWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Copilot Launcher"
-        Width="720"
+        Width="672"
         SizeToContent="Height"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -12,10 +12,14 @@
         Topmost="True"
         ShowActivated="True"
         WindowStartupLocation="Manual"
+        FontFamily="Segoe UI Variable Text, Segoe UI"
         PreviewKeyDown="QueryBox_PreviewKeyDown">
     <Window.Resources>
-        <SolidColorBrush x:Key="Fg" Color="#F2F2F7"/>
-        <SolidColorBrush x:Key="FgDim" Color="#9A9AA6"/>
+        <SolidColorBrush x:Key="Fg" Color="#E6EDF3"/>
+        <SolidColorBrush x:Key="Line" Color="#30363D"/>
+        <SolidColorBrush x:Key="Accent" Color="#2F81F7"/>
+        <SolidColorBrush x:Key="AccentBg" Color="#332F81F7"/>
+        <SolidColorBrush x:Key="FgDim" Color="#8B949E"/>
         <Style x:Key="ScrollThumb" TargetType="Thumb">
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="IsTabStop" Value="False"/>
@@ -76,75 +80,130 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
-                        <Border x:Name="Bd" CornerRadius="8" Background="Transparent" Padding="10,6">
-                            <ContentPresenter/>
-                        </Border>
+                        <Grid>
+                            <Border x:Name="Bd" CornerRadius="6" Background="Transparent"/>
+                            <Border x:Name="Bar" Width="3" HorizontalAlignment="Left" Margin="0,9" CornerRadius="1.5"
+                                    Background="{DynamicResource Accent}" Visibility="Collapsed"/>
+                            <ContentPresenter Margin="12,7,10,7"/>
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#3D6CF0"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBg}"/>
+                                <Setter TargetName="Bar" Property="Visibility" Value="Visible"/>
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsMouseOver" Value="True"/>
                                     <Condition Property="IsSelected" Value="False"/>
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="Bd" Property="Background" Value="#22FFFFFF"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#161B22"/>
                             </MultiTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="Kbd" TargetType="Border">
+            <Setter Property="Background" Value="#161B22"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="5,0,5,1"/>
+            <Setter Property="Margin" Value="0,0,3,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextElement.FontSize" Value="11"/>
+            <Setter Property="TextElement.Foreground" Value="#C9D1D9"/>
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource FgDim}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="3,0,16,0"/>
+        </Style>
     </Window.Resources>
 
-    <Border Margin="16" CornerRadius="14" Background="#EE1E1E24" BorderBrush="#33FFFFFF" BorderThickness="1">
+    <Border Margin="16" CornerRadius="12" Background="#0D1117" BorderBrush="{StaticResource Line}" BorderThickness="1">
         <Border.Effect>
-            <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.5"/>
+            <DropShadowEffect BlurRadius="32" ShadowDepth="8" Opacity="0.6" Color="#010409"/>
         </Border.Effect>
         <StackPanel>
-            <Grid Margin="18,14,18,14">
+            <Grid Margin="16,12,14,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Path Width="22" Height="22" Stretch="Uniform" Fill="{StaticResource FgDim}" VerticalAlignment="Center"
-                      Data="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                <Grid Grid.Column="1" Margin="12,0,0,0">
-                    <TextBlock x:Name="Placeholder" Text="Buscar aplicaciones y archivos…" FontSize="22"
-                               Foreground="{StaticResource FgDim}" IsHitTestVisible="False" VerticalAlignment="Center"/>
-                    <TextBox x:Name="QueryBox" FontSize="22" Background="Transparent" BorderThickness="0"
-                             Foreground="{StaticResource Fg}" CaretBrush="{StaticResource Fg}" VerticalAlignment="Center"
+                <Path Width="18" Height="18" Stretch="Uniform" Fill="{StaticResource FgDim}" VerticalAlignment="Center"
+                      Data="M10.68 11.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06ZM11.5 7a4.5 4.5 0 1 0-9 0 4.5 4.5 0 0 0 9 0Z"/>
+                <Grid Grid.Column="1" Margin="12,0,8,0">
+                    <TextBlock x:Name="Placeholder" Text="Buscar apps y archivos" FontSize="16"
+                               Foreground="#6E7681" IsHitTestVisible="False" VerticalAlignment="Center"/>
+                    <TextBox x:Name="QueryBox" FontSize="16" Background="Transparent" BorderThickness="0" Padding="0"
+                             Foreground="{StaticResource Fg}" CaretBrush="{DynamicResource Accent}"
+                             SelectionBrush="{DynamicResource Accent}" VerticalAlignment="Center"
                              TextChanged="QueryBox_TextChanged"/>
                 </Grid>
+                <Border Grid.Column="2" Style="{StaticResource Kbd}"><TextBlock Text="Esc"/></Border>
             </Grid>
 
-            <Border x:Name="ResultsPanel" BorderBrush="#22FFFFFF" BorderThickness="0,1,0,0" Visibility="Collapsed">
+            <Border x:Name="ResultsPanel" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Visibility="Collapsed">
                 <StackPanel>
-                    <ListBox x:Name="ResultsList" Background="Transparent" BorderThickness="0" Margin="8,6,8,0"
+                    <ListBox x:Name="ResultsList" Background="Transparent" BorderThickness="0" Margin="6,2,6,6"
                              MaxHeight="440" ItemContainerStyle="{StaticResource ResultItem}"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              MouseDoubleClick="ResultsList_MouseDoubleClick">
+                        <ListBox.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource FgDim}" Margin="10,8,0,4"/>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ListBox.GroupStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <Image Source="{Binding Icon}" Width="32" Height="32" VerticalAlignment="Center"
+                                    <Image Source="{Binding Icon}" Width="28" Height="28" VerticalAlignment="Center"
                                            RenderOptions.BitmapScalingMode="HighQuality"/>
-                                    <StackPanel Grid.Column="1" Margin="8,0" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Title}" FontSize="15" Foreground="{StaticResource Fg}" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Text="{Binding Subtitle}" FontSize="11.5" Foreground="{StaticResource FgDim}" TextTrimming="CharacterEllipsis"/>
+                                    <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Title}" FontSize="14" Foreground="{StaticResource Fg}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Subtitle}" FontSize="12" Foreground="{StaticResource FgDim}" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
-                                    <TextBlock Grid.Column="2" Text="{Binding KindLabel}" FontSize="11.5" Foreground="{StaticResource FgDim}" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="OpenHint" Grid.Column="2" Text="Abrir ↵" FontSize="12"
+                                               Foreground="{StaticResource FgDim}" VerticalAlignment="Center" Visibility="Hidden"/>
                                 </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                        <Setter TargetName="OpenHint" Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <TextBlock x:Name="StatusText" Margin="18,6,18,10" FontSize="11" Foreground="{StaticResource FgDim}"
-                               Text="Enter: abrir · Ctrl+Enter: abrir ubicación · Ctrl+Shift+Enter: como administrador · Esc: cerrar"/>
+                    <TextBlock x:Name="StatusText" Margin="16,0,16,8" FontSize="12" Foreground="{StaticResource FgDim}" Visibility="Collapsed"/>
+                    <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="14,8">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="↑"/></Border>
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="↓"/></Border>
+                            <TextBlock Style="{StaticResource Hint}" Text="navegar"/>
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="↵"/></Border>
+                            <TextBlock Style="{StaticResource Hint}" Text="abrir"/>
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="Ctrl"/></Border>
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="↵"/></Border>
+                            <TextBlock Style="{StaticResource Hint}" Text="carpeta"/>
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="Ctrl"/></Border>
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="⇧"/></Border>
+                            <Border Style="{StaticResource Kbd}"><TextBlock Text="↵"/></Border>
+                            <TextBlock Style="{StaticResource Hint}" Text="admin"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Border>
         </StackPanel>

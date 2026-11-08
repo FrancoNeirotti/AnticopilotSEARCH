@@ -75,15 +75,17 @@ public static class IconFactory
         {
             SHCreateItemFromParsingName(parsingName, IntPtr.Zero, typeof(IShellItemImageFactory).GUID, out var factory);
             var size = new SIZE { cx = 64, cy = 64 };
-            if (factory.GetImage(size, SIIGBF_ICONONLY | SIIGBF_BIGGERSIZEOK, out hbm) != 0 || hbm == IntPtr.Zero)
+            int hr = factory.GetImage(size, SIIGBF_ICONONLY | SIIGBF_BIGGERSIZEOK, out hbm);
+            if (hr != 0 || hbm == IntPtr.Zero)
                 return null;
             var src = Imaging.CreateBitmapSourceFromHBitmap(hbm, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             src.Freeze();
             Marshal.ReleaseComObject(factory);
             return src;
         }
-        catch
+        catch (Exception ex)
         {
+            Log.Info($"Error cargando ícono de {parsingName}: {ex.Message}");
             return null;
         }
         finally

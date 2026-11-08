@@ -10,6 +10,7 @@ Buscador nativo para Windows al estilo Spotlight de macOS. Presionás la **tecla
 - Busca archivos y carpetas con el índice de **Windows Search**, que es instantáneo. Si el índice no está disponible, escanea Escritorio, Documentos, Descargas, OneDrive, etc.
 - Coincidencia difusa: por prefijo, por inicio de palabra, por iniciales (`vsc` → Visual Studio Code) y sin distinguir acentos.
 - Muestra los íconos del sistema y funciona en la pantalla donde está el mouse.
+- Diseño oscuro inspirado en la paleta de comandos de GitHub, con resultados agrupados en "Aplicaciones" y "Archivos". El elemento seleccionado usa el **color de énfasis de Windows** (*Configuración → Personalización → Colores*) y se actualiza al instante si lo cambiás.
 - Corre en la bandeja del sistema, con una sola instancia y la opción "Iniciar con Windows".
 
 ## Atajos dentro del buscador
