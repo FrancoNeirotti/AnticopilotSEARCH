@@ -165,6 +165,7 @@ public partial class App : System.Windows.Application
             args.SetObserved();
         };
         SessionEnding += (_, args) => Log.Info($"Cierre de sesión de Windows: {args.ReasonSessionEnding}");
+        Microsoft.Win32.SystemEvents.SessionSwitch += (_, args) => Log.Info($"Cambio de sesión: {args.Reason}");
     }
 
     private void ExitApp()
